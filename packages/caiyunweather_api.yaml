@@ -1,0 +1,304 @@
+#################################
+######   彩云空气质量接口   ######
+################################
+# 定义传感器
+sensor:
+# 实时天气接口
+  - platform: rest
+    name: CaiyunWeather_realtime
+    resource: https://api.caiyunapp.com/v2/api_token/111.27620636,30.704655/realtime.json?&unit=metric:v2
+    value_template: >-
+          {% if value_json.status == 'ok' %}
+            有效
+          {% else %}
+            无效
+          {% endif %}
+    scan_interval: 1200                             #半小时更新一次天气数据
+    headers:
+      User-Agent: ColorfulCloudsPro/3.2.0 (iPhone; iOS 11.2.2; Scale/2.00)
+    json_attributes:
+      - result
+
+# 五天预报接口
+  - platform: rest
+    name: CaiyunWeather_forecast
+    resource: https://api.caiyunapp.com/v2/api_token/111.27620636,30.704655/forecast.json?&unit=metric:v2
+    value_template: >-
+          {% if value_json.status == 'ok' %}
+            有效
+          {% else %}
+            无效
+          {% endif %}
+    scan_interval: 1800                             #半小时更新一次天气数据
+    headers:
+      User-Agent: ColorfulCloudsPro/3.2.0 (iPhone; iOS 11.2.2; Scale/2.00)
+    json_attributes:
+      - result
+
+  - platform: template
+    sensors:
+    # 实时天气数据
+      now_caiyun_weather:
+        friendly_name: 天气状况
+        value_template: >-
+          {% set skycon = states.sensor.caiyunweather_realtime.attributes.result.skycon %}
+          {% if skycon == 'CLEAR_DAY' %}
+            晴天
+          {% elif skycon == 'CLEAR_NIGHT' %}
+            晴夜
+          {% elif skycon == 'PARTLY_CLOUDY_DAY' %}
+            日间多云
+          {% elif skycon == 'PARTLY_CLOUDY_NIGHT' %}
+            夜间多云
+          {% elif skycon == 'CLOUDY' %}
+            阴
+          {% elif skycon == 'RAIN' %}
+            雨
+          {% elif skycon == 'SNOW' %}
+            雪
+          {% elif skycon == 'WIND' %}
+            风
+          {% elif skycon == 'FOG' %}
+            雾
+          {% elif skycon == 'HAZE' %}
+            霾
+          {% elif skycon == 'SLEET' %}
+            冻雨
+          {% else %}
+            未知
+          {% endif %}
+        icon_template: >-
+          {% set skycon = states.sensor.caiyunweather_realtime.attributes.result.skycon %}
+          {% if skycon == 'CLEAR_DAY' %}
+            mdi:weather-sunny
+          {% elif skycon == 'CLEAR_NIGHT' %}
+            mdi:weather-night
+          {% elif skycon == 'PARTLY_CLOUDY_DAY' %}
+            mdi:weather-partlycloudy
+          {% elif skycon == 'PARTLY_CLOUDY_NIGHT' %}
+            mdi:weather-windy-variant
+          {% elif skycon == 'CLOUDY' %}
+            mdi:weather-cloudy
+          {% elif skycon == 'RAIN' %}
+            mdi:weather-rainy
+          {% elif skycon == 'SNOW' %}
+            mdi:weather-snowy
+          {% elif skycon == 'WIND' %}
+            mdi:weather-windy
+          {% elif skycon == 'FOG' %}
+            mdi:weather-fog
+          {% elif skycon == 'HAZE' %}
+            mdi:weather-hail
+          {% elif skycon == 'SLEET' %}
+            mdi:weather-snowy-rainy
+          {% else %}
+            mdi:help-circle-outline
+          {% endif %}
+      now_caiyun_temperature:
+        friendly_name: 温度
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.temperature }}'
+        unit_of_measurement: °C
+        icon_template: mdi:thermometer-lines
+      now_caiyun_humidity:
+        friendly_name: 湿度
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.humidity | multiply(100) | round(0) }}'
+        unit_of_measurement: '%'
+        icon_template: mdi:water-percent
+      now_caiyun_pressure:
+        friendly_name: 气压
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.pres | round(0) }}'
+        unit_of_measurement: 'hPa'
+        icon_template: mdi:periscope
+      now_caiyun_wind_dir:
+        friendly_name: 风向
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.wind.direction | round(0) }}'
+        icon_template: mdi:compass-outline
+      now_caiyun_wind_spd:
+        friendly_name: 风速
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.wind.speed | round(0) }}'
+        unit_of_measurement: 'km/h'
+        icon_template: mdi:weather-windy
+      now_caiyun_precipitation:
+        friendly_name: 降水量
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.precipitation.local.intensity | round(2) }}'
+        unit_of_measurement: 'mm/hr'
+        icon_template: mdi:weather-pouring
+      now_caiyun_cloudrate:
+        friendly_name: 云量
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.cloudrate | round(1) }}'
+        unit_of_measurement: 'km'
+        icon_template: mdi:soundcloud
+      now_caiyun_vis:
+        friendly_name: 能见度
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.visibility | round(1)}}'
+        unit_of_measurement: 'km'
+        icon_template: mdi:blur-radial
+      now_caiyun_comf:
+        friendly_name: 舒适度
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.comfort.desc }}'
+        icon_template: mdi:certificate
+      now_caiyun_uv:
+        friendly_name: 紫外线指数
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.ultraviolet.desc }}'
+        icon_template: mdi:image-filter-tilt-shift
+      now_caiyun_pm25:
+        friendly_name: PM2.5
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.pm25 | round(0) }}'
+        unit_of_measurement: ug/m3
+        icon_template: mdi:blur
+      now_caiyun_pm10:
+        friendly_name: PM10
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.pm10 | round(2) }}'
+        unit_of_measurement:  'μg/m3'
+        icon_template: mdi:blur
+      now_caiyun_o3:
+        friendly_name: 臭氧含量
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.o3 | round(2) }}'
+        unit_of_measurement:  'μg/m3'
+        icon_template: mdi:soundcloud
+      now_caiyun_no2:
+        friendly_name: 二氧化氮
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.no2 | round(2) }}'
+        unit_of_measurement:  'μg/m3'
+        icon_template: mdi:blur-linear
+      now_caiyun_so2:
+        friendly_name: 二氧化硫
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.so2 | round(2) }}'
+        unit_of_measurement:  'μg/m3'
+        icon_template: mdi:blur-off
+      now_caiyun_co:
+        friendly_name: 一氧化碳
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.co | round(2) }}'
+        unit_of_measurement:  'mg/m3'
+        icon_template: mdi:blur-linear
+      now_caiyun_aqi:
+        friendly_name: 空气质量
+        value_template: '{{ states.sensor.caiyunweather_realtime.attributes.result.aqi | round(0) }}'
+        unit_of_measurement: 'AQI'
+        icon_template: mdi:weather-cloudy
+    # 气象预报数据
+      caiyun_weather_hourly_des:
+        friendly_name: 小时级气象预报
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.hourly.description }}'
+      caiyun_weather_minutely_des:
+        friendly_name: 分钟级气象预报
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.minutely.description }}'
+    # 五天预报数据
+      # 五日最高气温
+      caiyun_now_high_temperature:
+        friendly_name: 最高气温
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][0]["max"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_high_temperature_1:
+        friendly_name: 最高气温1
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][1]["max"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_high_temperature_2:
+        friendly_name: 最高气温2
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][2]["max"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_high_temperature_3:
+        friendly_name: 最高气温3
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][3]["max"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_high_temperature_4:
+        friendly_name: 最高气温4
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][4]["max"] | round(2) }}'
+        unit_of_measurement: °C
+      # 五日最低气温
+      caiyun_now_low_temperature:
+        friendly_name: 最低气温
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][0]["min"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_low_temperature_1:
+        friendly_name: 最低气温1
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][1]["min"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_low_temperature_2:
+        friendly_name: 最低气温2
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][2]["min"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_low_temperature_3:
+        friendly_name: 最低气温3
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][3]["min"] | round(2) }}'
+        unit_of_measurement: °C
+      caiyun_low_temperature_4:
+        friendly_name: 最低气温4
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["temperature"][4]["min"] | round(2) }}'
+        unit_of_measurement: °C
+      # 五日空气指数
+      caiyun_now_air_aqi:
+        friendly_name: 空气指数
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result["daily"]["aqi"][0]["avg"] }}'
+        icon_template: mdi:weather-hail
+      caiyun_air_aqi_1:
+        friendly_name: 空气指数1
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result["daily"]["aqi"][1]["avg"] }}'
+        icon_template: mdi:weather-hail
+      caiyun_air_aqi_2:
+        friendly_name: 空气指数2
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result["daily"]["aqi"][2]["avg"] }}'
+        icon_template: mdi:weather-hail
+      caiyun_air_aqi_3:
+        friendly_name: 空气指数3
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result["daily"]["aqi"][3]["avg"] }}'
+        icon_template: mdi:weather-hail
+      caiyun_air_aqi_4:
+        friendly_name: 空气指数4
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result["daily"]["aqi"][4]["avg"] }}'
+        icon_template: mdi:weather-hail
+      # 五日天气状况
+      caiyun_now_weather:
+        friendly_name: 当前天气
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["skycon"][0]["value"] }}'
+      caiyun_weather_1:
+        friendly_name: 一日天气
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["skycon"][1]["value"] }}'
+      caiyun_weather_2:
+        friendly_name: 二日天气
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["skycon"][2]["value"] }}'
+      caiyun_weather_3:
+        friendly_name: 三日天气
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["skycon"][3]["value"] }}'
+      caiyun_weather_4:
+        friendly_name: 四日天气
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["skycon"][4]["value"] }}'
+      # 五日洗车指数
+      caiyun_now_carwash:
+        friendly_name: 洗车指数
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["carWashing"][0]["desc"] }}'
+      caiyun_carwash_1:
+        friendly_name: 洗车指数1
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["carWashing"][1]["desc"] }}'
+      caiyun_carwash_2:
+        friendly_name: 洗车指数2
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["carWashing"][2]["desc"] }}'
+      caiyun_carwash_3:
+        friendly_name: 洗车指数3
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["carWashing"][3]["desc"] }}'
+      caiyun_carwash_4:
+        friendly_name: 洗车指数4
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["carWashing"][4]["desc"] }}'
+      # 五日降水量
+      caiyun_precipitation_1:
+        friendly_name: 降水量1
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["precipitation"][1]["avg"] }}'
+      caiyun_precipitation_2:
+        friendly_name: 降水量2
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["precipitation"][2]["avg"] }}'
+      caiyun_precipitation_3:
+        friendly_name: 降水量3
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["precipitation"][3]["avg"] }}'
+      caiyun_precipitation_4:
+        friendly_name: 降水量4
+        value_template: '{{ states.sensor.caiyunweather_forecast.attributes.result.daily["precipitation"][4]["avg"] }}'
+
+# 常用badge图标颜色定义
+homeassistant:
+  customize:
+    sensor.now_caiyun_weather:
+      friendly_name: 天气状况
+      homebridge_hidden: true
+      templates:
+        theme: >
+          if (state = '晴天') return 'green'; else if (state = '晴夜') return 'yellow'; else if (state = '多云') return 'comfortable'; else if (state = '冻雨') return 'hot'; else if (state = '雨') return 'cold'; else if (state = '霾') return 'purple'; else if (state = '阴') return 'gray'; else return 'default';
