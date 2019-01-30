@@ -122,10 +122,37 @@ class CaiyunWeatherCard extends HTMLElement {
 
     var weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
     var d = new Date();
-    var forecastDate1 = weekday[d.getDay()+1];
-    var forecastDate2 = weekday[d.getDay()+2];
-    var forecastDate3 = weekday[d.getDay()+3];
-    var forecastDate4 = weekday[d.getDay()+4];
+    if(d.getDay() >= 3){
+      var t1=d.getDay()+1;
+      var t2=d.getDay()+2;
+      var t3=d.getDay()+3;
+      var t4=d.getDay()-3;
+    }else if(d.getDay() >= 4){
+      var t1=d.getDay()+1;
+      var t2=d.getDay()+2;
+      var t3=d.getDay()-4;
+      var t4=d.getDay()-3;
+    }else if(d.getDay() >= 5){
+      var t1=d.getDay()+1;
+      var t2=d.getDay()-5;
+      var t3=d.getDay()-4;
+      var t4=d.getDay()-3;
+    }else if(d.getDay() >= 6){
+      var t1=d.getDay()-6;
+      var t2=d.getDay()-5;
+      var t3=d.getDay()-4;
+      var t4=d.getDay()-3;
+    }else{
+      var t1=d.getDay()+1;
+      var t2=d.getDay()+2;
+      var t3=d.getDay()+3;
+      var t4=d.getDay()+4;
+    }
+    
+    var forecastDate1 = weekday[t1];
+    var forecastDate2 = weekday[t2];
+    var forecastDate3 = weekday[t3];
+    var forecastDate4 = weekday[t4];
 
     const title = this.config.title;
     const location = this.config.location;
