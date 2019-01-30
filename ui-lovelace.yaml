@@ -1,0 +1,53 @@
+  # Caiyun weather 天气插件
+  - url: /local/lovelace_ui/resources/caiyun-weather-card.js
+    type: module
+
+title: MyHome
+views:
+  - icon: mdi:home-assistant
+    id: home
+    title: CaiYunWeather
+    cards:
+      - type: custom:caiyun-weather-card
+        title: '彩云天气'
+        location: '湖北宜昌'
+        entity_sun: sun.sun
+        entity_hourly_summary: sensor.caiyun_weather_hourly_des
+        entity_minutely_summary: sensor.caiyun_weather_minutely_des
+        entity_current_conditions: sensor.now_caiyun_weather
+        entity_humidity: sensor.now_caiyun_humidity
+        entity_pressure: sensor.now_caiyun_pressure
+        entity_precipitation: sensor.now_caiyun_precipitation
+        entity_temperature: sensor.now_caiyun_temperature
+        entity_visibility: sensor.now_caiyun_vis
+        entity_wind_bearing: sensor.now_caiyun_wind_dir
+        entity_wind_speed: sensor.now_caiyun_wind_spd
+        entity_now_aqipm25: sensor.now_caiyun_pm25
+        entity_now_air_aqi: sensor.air_now_city_aqi
+        entity_now_temphigh: sensor.caiyun_now_high_temperature
+        entity_now_templow: sensor.caiyun_now_low_temperature
+        entity_carwash: sensor.caiyun_now_carwash
+        entity_forecast_temphigh_1: sensor.caiyun_high_temperature_1
+        entity_forecast_temphigh_2: sensor.caiyun_high_temperature_2
+        entity_forecast_temphigh_3: sensor.caiyun_high_temperature_3
+        entity_forecast_temphigh_4: sensor.caiyun_high_temperature_4
+        entity_forecast_templow_1: sensor.caiyun_low_temperature_1
+        entity_forecast_templow_2: sensor.caiyun_low_temperature_2
+        entity_forecast_templow_3: sensor.caiyun_low_temperature_3
+        entity_forecast_templow_4: sensor.caiyun_low_temperature_4
+        entity_forecast_skycon_1: sensor.caiyun_weather_1
+        entity_forecast_skycon_2: sensor.caiyun_weather_2
+        entity_forecast_skycon_3: sensor.caiyun_weather_3
+        entity_forecast_skycon_4: sensor.caiyun_weather_4
+        entity_forecast_aqi_1: sensor.caiyun_air_aqi_1
+        entity_forecast_aqi_2: sensor.caiyun_air_aqi_2
+        entity_forecast_aqi_3: sensor.caiyun_air_aqi_3
+        entity_forecast_aqi_4: sensor.caiyun_air_aqi_4
+        entity_forecast_carwash_1: sensor.caiyun_carwash_1
+        entity_forecast_carwash_2: sensor.caiyun_carwash_2
+        entity_forecast_carwash_3: sensor.caiyun_carwash_3
+        entity_forecast_carwash_4: sensor.caiyun_carwash_4
+        entity_forecast_precipitation_1: sensor.caiyun_precipitation_1
+        entity_forecast_precipitation_2: sensor.caiyun_precipitation_2
+        entity_forecast_precipitation_3: sensor.caiyun_precipitation_3
+        entity_forecast_precipitation_4: sensor.caiyun_precipitation_4
