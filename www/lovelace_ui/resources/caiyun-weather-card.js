@@ -120,7 +120,7 @@ class CaiyunWeatherCard extends HTMLElement {
       '北风'
     ];
 
-    var weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    var weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
     var d = new Date();
     if(d.getDay() >= 3){
       var t1=d.getDay()+1;
