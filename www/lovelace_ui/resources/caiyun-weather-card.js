@@ -120,24 +120,24 @@ class CaiyunWeatherCard extends HTMLElement {
       '北风'
     ];
 
-    var weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+    var weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
     var d = new Date();
-    if(d.getDay() >= 3){
+    if(d.getDay() == 3){
       var t1=d.getDay()+1;
       var t2=d.getDay()+2;
       var t3=d.getDay()+3;
       var t4=d.getDay()-3;
-    }else if(d.getDay() >= 4){
+    }else if(d.getDay() == 4){
       var t1=d.getDay()+1;
       var t2=d.getDay()+2;
       var t3=d.getDay()-4;
       var t4=d.getDay()-3;
-    }else if(d.getDay() >= 5){
+    }else if(d.getDay() == 5){
       var t1=d.getDay()+1;
       var t2=d.getDay()-5;
       var t3=d.getDay()-4;
       var t4=d.getDay()-3;
-    }else if(d.getDay() >= 6){
+    }else if(d.getDay() == 6){
       var t1=d.getDay()-6;
       var t2=d.getDay()-5;
       var t3=d.getDay()-4;
@@ -148,7 +148,7 @@ class CaiyunWeatherCard extends HTMLElement {
       var t3=d.getDay()+3;
       var t4=d.getDay()+4;
     }
-    
+
     var forecastDate1 = weekday[t1];
     var forecastDate2 = weekday[t2];
     var forecastDate3 = weekday[t3];
@@ -170,8 +170,8 @@ class CaiyunWeatherCard extends HTMLElement {
     const carWash = hass.states[this.config.entity_carwash].state;
     const tempHigh = Math.round(hass.states[this.config.entity_now_temphigh].state);
     const tempLow = Math.round(hass.states[this.config.entity_now_templow].state);
-    const hourly_summary = hass.states[this.config.entity_hourly_summary].state;
-    const minutely_summary = hass.states[this.config.entity_minutely_summary].state;
+    var hourly_summary = hass.states[this.config.entity_hourly_summary].state;
+    var minutely_summary = hass.states[this.config.entity_minutely_summary].state;
     const forecast1 = { date: forecastDate1,
     				   condition: this.config.entity_forecast_skycon_1,
     				   temphigh: this.config.entity_forecast_temphigh_1,
@@ -213,13 +213,36 @@ class CaiyunWeatherCard extends HTMLElement {
     var sunrise_up = (new Date(sunObj.attributes.next_rising)).toTimeString().substring(0,5);
     var sunrise_down = (new Date(sunObj.attributes.next_setting)).toTimeString().substring(0,5);
     var sunrise_day = d.toTimeString().substring(0,5);
-    const sunriseIcon = function (sunrise) {
-      if (sunrise_day >= sunrise_up && sunrise_day <= sunrise_down){
-        sunrise = '1'
-      } else if (sunrise_day >= sunrise_down && sunrise_day <= sunrise_up){
-        sunrise = '2'
+    const sunrise_upIcon = function (sunrise) {
+      // if (sunrise_day >= sunrise_up && sunrise_day <= sunrise_down){
+      //   sunrise = '1'
+      // } else if (sunrise_day >= sunrise_down && sunrise_day <= sunrise_up){
+      //   sunrise = '2'
+      // }
+      // return sunrise;
+      if (sunrise_day >= sunrise_up){
+        sunrise = '明天 '
+      } else{
+        sunrise = '今天 '
       }
       return sunrise;
+    }
+    const sunrise_downIcon = function (sunrise) {
+      if (sunrise_day >= sunrise_down){
+        sunrise = '明天 '
+      } else{
+        sunrise = '今天 '
+      }
+      return sunrise;
+    }
+
+    var hourly_summary1 = hourly_summary.match(/[^，。]+/);
+    var minutely_summary1 = minutely_summary.match(/[^，]+/);
+    if (hourly_summary1){
+      hourly_summary = hourly_summary1;
+    }
+    if (minutely_summary1){
+      minutely_summary = minutely_summary1
     }
 
     this.content.innerHTML = `
@@ -234,9 +257,9 @@ class CaiyunWeatherCard extends HTMLElement {
             <span class="pm25" style='${forecast_azt(currentAqi)}'>${forecast_aqi(currentAqi)}</span>
             </li>
               <span class="sunset" style=''>
-                  ${sunriseTime(sunObj.attributes.next_rising)}${sunriseIcon()}
+                  ${sunrise_upIcon()}${sunriseTime(sunObj.attributes.next_rising)}
                   <iron-icon icon="mdi:weather-sunset"></iron-icon>
-                  ${sunriseTime(sunObj.attributes.next_setting)}</span>
+                  ${sunrise_downIcon()}${sunriseTime(sunObj.attributes.next_setting)}</span>
           </div>
           <div class="variations">
              <iron-icon icon="mdi:compass"></iron-icon>${location}
@@ -267,7 +290,7 @@ class CaiyunWeatherCard extends HTMLElement {
                     <br><i class="icon" style="background: none, url(/local/lovelace_ui/images/weather_animated_icons/${skyconIcons[hass.states[daily.condition].state]}.svg) no-repeat; background-size: contain;"></i>
                     <br><span class="highTemp">${Math.round(hass.states[daily.temphigh].state * 10) / 10}&#176;/${Math.round(hass.states[daily.templow].state * 10) / 10}&#176;</span>
                     <br><span class="pm25" style='${forecast_azt(hass.states[daily.forecastaqi].state)}'>${forecast_aqi(hass.states[daily.forecastaqi].state)}</span>
-                    <br><iron-icon icon="mdi:weather-rainy"></iron-icon><span class="highTemp">${hass.states[daily.precipitation].state}</span><span class="unit">毫米</span>
+                    <br><iron-icon icon="mdi:weather-rainy"></iron-icon><span class="highTemp">${Math.round(hass.states[daily.precipitation].state * 10) / 10}</span><span class="unit">毫米</span>
                     <br><span class="carwash" style='${forecast_wash[hass.states[daily.carwash].state]}'>${hass.states[daily.carwash].state}洗车</span>
                 </div>`).join('')}
         </div>
