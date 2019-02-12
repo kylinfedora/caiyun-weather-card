@@ -23,7 +23,7 @@ views:
         entity_wind_bearing: sensor.now_caiyun_wind_dir
         entity_wind_speed: sensor.now_caiyun_wind_spd
         entity_now_aqipm25: sensor.now_caiyun_pm25
-        entity_now_air_aqi: sensor.air_now_city_aqi
+        entity_now_air_aqi: sensor.caiyun_now_air_aqi
         entity_now_temphigh: sensor.caiyun_now_high_temperature
         entity_now_templow: sensor.caiyun_now_low_temperature
         entity_carwash: sensor.caiyun_now_carwash
